@@ -10,6 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
   drawFilterListTable()
   drawIntentListTable()
   setAddButtonListener()
+  setEnableInvertedModeListener()
 
   // update threshold display value
   const slider = document.getElementById('thresholdSlider') as HTMLInputElement
@@ -28,7 +29,9 @@ document.addEventListener('DOMContentLoaded', () => {
     getElementFromForm('customMessage').value = storage.customMessage || ''
     getElementFromForm('enableBlobs').checked = storage.enableBlobs ?? true
     getElementFromForm('enable3D').checked = storage.enable3D ?? true
+    getElementFromForm('enableInvertedMode').checked = storage.enableInvertedMode ?? false
     getElementFromForm('thresholdSlider').value = storage.predictionThreshold || 0.5
+    changeSitesInfo(storage.enableInvertedMode)
     display.innerHTML = sliderToValue(slider)
   })
 
@@ -44,6 +47,7 @@ function saveCurrentOptions(): void {
   const customMessage: string = getElementFromForm('customMessage').value
   const enableBlobs: boolean = getElementFromForm('enableBlobs').checked
   const enable3D: boolean = getElementFromForm('enable3D').checked
+  const enableInvertedMode: boolean = getElementFromForm('enableInvertedMode').checked
   const predictionThreshold: number = getElementFromForm('thresholdSlider').value
 
   setStorage({
@@ -52,6 +56,7 @@ function saveCurrentOptions(): void {
     customMessage: customMessage,
     enableBlobs: enableBlobs,
     enable3D: enable3D,
+    enableInvertedMode: enableInvertedMode,
     predictionThreshold: predictionThreshold,
     minIntentLength: minIntentLength,
   }).then(() => {
@@ -175,6 +180,25 @@ function drawIntentListTable(): void {
       previousIntents.innerHTML = table
     }
   })
+}
+
+// sets event listener for enable inverted mode checkbox operations
+function setEnableInvertedModeListener(): void {
+  const enableInvertedModeCheckbox: HTMLFormElement = getElementFromForm('enableInvertedMode')
+
+  enableInvertedModeCheckbox.addEventListener('change', function () {
+    changeSitesInfo(this.checked)
+  })
+}
+
+function changeSitesInfo(invertedMode: boolean): void {
+  if (invertedMode) {
+    document.getElementById('sites-info').innerHTML =
+      'a list of sites you would like to allow. sites not added here will have the reflect prompt shown to you.'
+  } else {
+    document.getElementById('sites-info').innerHTML =
+      'a list of sites you would like to be more mindful of. sites added here will have the reflect prompt shown to you.'
+  }
 }
 
 // sets event listeners for add new url operations

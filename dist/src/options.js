@@ -46,6 +46,7 @@
     drawFilterListTable();
     drawIntentListTable();
     setAddButtonListener();
+    setEnableInvertedModeListener();
     const slider = document.getElementById("thresholdSlider");
     const display = document.getElementById("thresholdSliderValue");
     const sliderToValue = (slider2) => `${Math.round(+slider2.value * 100)}%`;
@@ -53,14 +54,16 @@
       display.innerHTML = sliderToValue(slider);
     };
     getStorage().then((storage2) => {
-      var _a, _b, _c;
+      var _a, _b, _c, _d;
       getElementFromForm("whitelistTime").value = storage2.whitelistTime;
       getElementFromForm("numIntentEntries").value = storage2.numIntentEntries;
       getElementFromForm("minIntentLength").value = (_a = storage2.minIntentLength, _a !== null && _a !== void 0 ? _a : 3);
       getElementFromForm("customMessage").value = storage2.customMessage || "";
       getElementFromForm("enableBlobs").checked = (_b = storage2.enableBlobs, _b !== null && _b !== void 0 ? _b : true);
       getElementFromForm("enable3D").checked = (_c = storage2.enable3D, _c !== null && _c !== void 0 ? _c : true);
+      getElementFromForm("enableInvertedMode").checked = (_d = storage2.enableInvertedMode, _d !== null && _d !== void 0 ? _d : false);
       getElementFromForm("thresholdSlider").value = storage2.predictionThreshold || 0.5;
+      changeSitesInfo(storage2.enableInvertedMode);
       display.innerHTML = sliderToValue(slider);
     });
     document.getElementById("save").addEventListener("click", saveCurrentOptions);
@@ -72,6 +75,7 @@
     const customMessage = getElementFromForm("customMessage").value;
     const enableBlobs = getElementFromForm("enableBlobs").checked;
     const enable3D = getElementFromForm("enable3D").checked;
+    const enableInvertedMode = getElementFromForm("enableInvertedMode").checked;
     const predictionThreshold = getElementFromForm("thresholdSlider").value;
     setStorage({
       numIntentEntries,
@@ -79,6 +83,7 @@
       customMessage,
       enableBlobs,
       enable3D,
+      enableInvertedMode,
       predictionThreshold,
       minIntentLength
     }).then(() => {
@@ -167,6 +172,19 @@
         previousIntents.innerHTML = table;
       }
     });
+  }
+  function setEnableInvertedModeListener() {
+    const enableInvertedModeCheckbox = getElementFromForm("enableInvertedMode");
+    enableInvertedModeCheckbox.addEventListener("change", function() {
+      changeSitesInfo(this.checked);
+    });
+  }
+  function changeSitesInfo(invertedMode) {
+    if (invertedMode) {
+      document.getElementById("sites-info").innerHTML = "a list of sites you would like to allow. sites not added here will have the reflect prompt shown to you.";
+    } else {
+      document.getElementById("sites-info").innerHTML = "a list of sites you would like to be more mindful of. sites added here will have the reflect prompt shown to you.";
+    }
   }
   function setAddButtonListener() {
     const urlInputElement = document.getElementById("urlInput");

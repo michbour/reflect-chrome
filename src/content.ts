@@ -39,13 +39,20 @@ function checkIfBlocked(): void {
 
     const strippedURL: string = getStrippedUrl()
 
-    // match current url against stored blocklist
-    storage.blockedSites.forEach((site: string) => {
-      if (strippedURL.includes(site) && !isWhitelistedWrapper()) {
-        // found a match, check if currently on whitelist
+    if (storage.enableInvertedMode) {
+      let inWhitelistedSites = storage.blockedSites.some((site) => strippedURL.includes(site))
+      if (!inWhitelistedSites) {
         iterWhitelist()
       }
-    })
+    } else {
+      // match current url against stored blocklist
+      storage.blockedSites.forEach((site: string) => {
+        if (strippedURL.includes(site) && !isWhitelistedWrapper()) {
+          // found a match, check if currently on whitelist
+          iterWhitelist()
+        }
+      })
+    }
   })
 }
 
@@ -127,8 +134,6 @@ function loadBlockPage(strippedURL: string): void {
       // modify custom message based on user input
       const welcome = document.getElementById('customMessageContent')
       welcome.textContent = storage.customMessage || 'hey! what are you here for?'
-
-      var simplemde = new SimpleMDE()
     })
   })
 }

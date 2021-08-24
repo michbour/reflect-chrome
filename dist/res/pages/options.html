@@ -80,6 +80,16 @@
 					</tr>
 					<tr>
 						<td>
+							<h3 class="setting">enable inverted mode.</h3>
+							<p class="subtext">block all websites except for those in the below list.</p>
+						</td>
+						<td>
+							<input class='toggle' id='enableInvertedMode' type='checkbox'>
+							<label class='toggle-button' for='enableInvertedMode'></label>
+						</td>
+					</tr>
+					<tr>
+						<td>
 						</td>
 						<td>
 							<input id="save" class="ripple" type="submit" value="save">
@@ -94,7 +104,7 @@
 
 			<div class="sites_panel">
 				<h2>sites.</h2>
-				<p>a list of sites you would like to be more mindful of. sites added here will have the reflect prompt shown to you.</p>
+				<p id="sites-info">a list of sites you would like to be more mindful of. sites added here will have the reflect prompt shown to you.</p>
 					<div id="addSite">
 						<input type="text" id="urlInput" />
 						<input class="urlSubmit ripple" type="submit" id="add" value="add site">

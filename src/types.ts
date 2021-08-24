@@ -11,6 +11,7 @@ export interface Storage {
   isEnabled?: boolean
   enableBlobs?: boolean
   enable3D?: boolean
+  enableInvertedMode?: boolean
 
   // lists
   blockedSites?: string[]

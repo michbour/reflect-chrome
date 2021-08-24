@@ -13,7 +13,7 @@ document.addEventListener('DOMContentLoaded', () => {
   getStorage().then((storage) => {
     // set toggle state to storage value
     toggleSwitch.checked = storage.isEnabled
-    setupBlockListener(storage.blockedSites)
+    setupBlockListener(storage.blockedSites, storage.enableInvertedMode)
   })
 })
 
@@ -28,15 +28,21 @@ function toggleState(e) {
 }
 
 // return what current text of button should be
-function getButtonText(url: string, blockedSites: string[]): string {
-  return blockedSites.includes(url) ? 'unblock page.' : 'block page.'
+function getButtonText(url: string, blockedSites: string[], invertedMode: boolean): string {
+  if (!invertedMode) {
+    return blockedSites.includes(url) ? 'unblock page.' : 'block page.'
+  } else {
+    return blockedSites.includes(url) ? 'unallow page.' : 'allow page.'
+  }
 }
 
 // setup listener for what block button should do
-function setupBlockListener(blockedSites) {
+function setupBlockListener(blockedSites, invertedMode) {
   chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
     const urls: string[] = tabs.map((x) => x.url)
     const domain: string = cleanDomain(urls)
+
+    document.getElementById('block').innerHTML = getButtonText(domain, blockedSites, invertedMode)
 
     // not on a page (probably new tab)
     if (domain === '') {
@@ -45,7 +51,6 @@ function setupBlockListener(blockedSites) {
     }
 
     document.getElementById('curDomain').textContent = domain
-    document.getElementById('block').innerHTML = getButtonText(domain, blockedSites)
     document.getElementById('block').addEventListener('click', () => {
       const port: chrome.runtime.Port = chrome.runtime.connect({
         name: 'blockFromPopup',
@@ -53,12 +58,12 @@ function setupBlockListener(blockedSites) {
 
       // toggle state text and update background script
       const buttonText: string = document.getElementById('block').innerHTML
-      if (buttonText == 'block page.') {
+      if (buttonText == 'block page.' || buttonText == 'allow page.') {
         port.postMessage({ unblock: false, siteURL: domain })
-        document.getElementById('block').innerHTML = 'unblock page.'
+        document.getElementById('block').innerHTML = invertedMode ? 'unallow page.' : 'unblock page.'
       } else {
         port.postMessage({ unblock: true, siteURL: domain })
-        document.getElementById('block').innerHTML = 'block page.'
+        document.getElementById('block').innerHTML = invertedMode ? 'allow page.' : 'block page.'
       }
 
       // cleanup connection
